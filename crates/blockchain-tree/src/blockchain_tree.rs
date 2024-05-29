@@ -2366,14 +2366,8 @@ mod tests {
         let genesis = data.genesis;
 
         // test pops execution results from vector, so order is from last to first.
-        let externals = setup_externals(vec![
-            exec3.clone(),
-            exec2.clone(),
-            exec1.clone(),
-            exec3.clone(),
-            exec2.clone(),
-            exec1.clone(),
-        ]);
+        let externals =
+            setup_externals(vec![exec3.clone(), exec2.clone(), exec1.clone(), exec3, exec2, exec1]);
         let cloned_externals = TreeExternals {
             provider_factory: externals.provider_factory.clone(),
             executor_factory: externals.executor_factory.clone(),
@@ -2398,7 +2392,7 @@ mod tests {
         );
 
         assert_eq!(
-            tree.insert_block(block3.clone(), BlockValidationKind::Exhaustive).unwrap(),
+            tree.insert_block(block3, BlockValidationKind::Exhaustive).unwrap(),
             InsertPayloadOk::Inserted(BlockStatus::Valid(BlockAttachment::Canonical))
         );
 
@@ -2409,7 +2403,7 @@ mod tests {
         let mut tree =
             BlockchainTree::new(cloned_externals, config, None).expect("failed to create tree");
 
-        let mut block1a = block1.clone();
+        let mut block1a = block1;
         let block1a_hash = B256::new([0x33; 32]);
         block1a.set_hash(block1a_hash);
 
