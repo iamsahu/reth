@@ -7,11 +7,11 @@ use clap::Parser;
 use reth_db::{
     cursor::DbCursorRO, database::Database, open_db_read_only, table::Table, transaction::DbTx,
     AccountChangeSets, AccountsHistory, AccountsTrie, BlockBodyIndices, BlockOmmers, BlockRequests,
-    BlockWithdrawals, Bytecodes, CanonicalHeaders, DatabaseEnv, HashedAccounts, HashedStorages,
-    HeaderNumbers, HeaderTerminalDifficulties, Headers, PlainAccountState, PlainStorageState,
-    PruneCheckpoints, Receipts, StageCheckpointProgresses, StageCheckpoints, StorageChangeSets,
-    StoragesHistory, StoragesTrie, Tables, TransactionBlocks, TransactionHashNumbers,
-    TransactionSenders, Transactions, VersionHistory,
+    BlockWithdrawals, Bytecodes, CanonicalHeaders, DatabaseEnv, FinalizedBlocks, HashedAccounts,
+    HashedStorages, HeaderNumbers, HeaderTerminalDifficulties, Headers, PlainAccountState,
+    PlainStorageState, PruneCheckpoints, Receipts, StageCheckpointProgresses, StageCheckpoints,
+    StorageChangeSets, StoragesHistory, StoragesTrie, Tables, TransactionBlocks,
+    TransactionHashNumbers, TransactionSenders, Transactions, VersionHistory,
 };
 use std::{
     collections::HashMap,
@@ -156,6 +156,9 @@ impl Command {
                 }
                 Tables::VersionHistory => {
                     find_diffs::<VersionHistory>(primary_tx, secondary_tx, output_dir)?
+                }
+                Tables::FinalizedBlocks => {
+                    find_diffs::<FinalizedBlocks>(primary_tx, secondary_tx, output_dir)?
                 }
             };
         }

@@ -2,12 +2,19 @@
 
 use reth_consensus::Consensus;
 use reth_db::{
-    cursor::DbCursorRO, database::Database, static_file::HeaderMask, tables, transaction::DbTx,
+    cursor::DbCursorRO,
+    database::Database,
+    static_file::HeaderMask,
+    tables,
+    transaction::{DbTx, DbTxMut},
 };
 use reth_primitives::{BlockHash, BlockNumber, StaticFileSegment};
 use reth_provider::{ProviderFactory, StaticFileProviderFactory, StatsReader};
 use reth_storage_errors::provider::ProviderResult;
 use std::{collections::BTreeMap, sync::Arc};
+
+/// Table key used to read and write the last finalized block.
+const FINALIZED_BLOCKS_KEY: u64 = 0;
 
 /// A container for external components.
 ///
@@ -81,5 +88,32 @@ impl<DB: Database, E> TreeExternals<DB, E> {
         // the requested number.
         let hashes = hashes.into_iter().rev().take(num_hashes).collect();
         Ok(hashes)
+    }
+
+    /// Fetches and returns the latest finalized block number.
+    pub(crate) fn fetch_latest_finalized_block_number(&self) -> ProviderResult<BlockNumber> {
+        let mut finalized_blocks = self
+            .provider_factory
+            .provider()?
+            .tx_ref()
+            .cursor_read::<tables::FinalizedBlocks>()?
+            .walk(Some(FINALIZED_BLOCKS_KEY))?
+            .take(1)
+            .collect::<Result<BTreeMap<BlockNumber, BlockNumber>, _>>()?;
+
+        let last_finalized_block_number = finalized_blocks.pop_first().unwrap_or_default();
+        Ok(last_finalized_block_number.1)
+    }
+
+    /// Saves finalized block.
+    pub(crate) fn save_finalized_block_number(
+        &self,
+        block_number: BlockNumber,
+    ) -> ProviderResult<()> {
+        let provider = self.provider_factory.provider_rw()?;
+        provider.tx_ref().put::<tables::FinalizedBlocks>(FINALIZED_BLOCKS_KEY, block_number)?;
+        provider.commit()?;
+
+        Ok(())
     }
 }

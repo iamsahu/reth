@@ -9,7 +9,7 @@ use itertools::Itertools;
 use reth_db::{
     database::Database, mdbx, static_file::iter_static_files, AccountChangeSets, AccountsHistory,
     AccountsTrie, BlockBodyIndices, BlockOmmers, BlockRequests, BlockWithdrawals, Bytecodes,
-    CanonicalHeaders, DatabaseEnv, HashedAccounts, HashedStorages, HeaderNumbers,
+    CanonicalHeaders, DatabaseEnv, FinalizedBlocks, HashedAccounts, HashedStorages, HeaderNumbers,
     HeaderTerminalDifficulties, Headers, PlainAccountState, PlainStorageState, PruneCheckpoints,
     Receipts, StageCheckpointProgresses, StageCheckpoints, StorageChangeSets, StoragesHistory,
     StoragesTrie, Tables, TransactionBlocks, TransactionHashNumbers, TransactionSenders,
@@ -361,6 +361,7 @@ impl Command {
                 Tables::TransactionSenders => viewer.get_checksum::<TransactionSenders>().unwrap(),
                 Tables::Transactions => viewer.get_checksum::<Transactions>().unwrap(),
                 Tables::VersionHistory => viewer.get_checksum::<VersionHistory>().unwrap(),
+                Tables::FinalizedBlocks => viewer.get_checksum::<FinalizedBlocks>().unwrap(),
             };
 
             // increment duration for final report
