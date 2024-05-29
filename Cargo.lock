@@ -6643,9 +6643,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "reth-benchmark"
+name = "reth-bench"
 version = "0.2.0-beta.7"
 dependencies = [
+ "alloy-consensus 0.1.0 (git+https://github.com/alloy-rs/alloy?rev=bd39117)",
+ "alloy-eips 0.1.0 (git+https://github.com/alloy-rs/alloy?rev=bd39117)",
  "alloy-json-rpc",
  "alloy-provider",
  "alloy-pubsub",
